@@ -1,0 +1,41 @@
+---
+
+- name: Elasticsearch | Enable service Elasticsearch, and not touch the state
+  ansible.builtin.service:
+    name: elasticsearch
+    enabled: yes
+    state: restarted
+
+- name: Elasticsearch | Add network.host
+  ansible.builtin.lineinfile:
+    path: /etc/elasticsearch/elasticsearch.yml
+    regexp: '#network.host: 192.168.0.1'
+    line: "network.host: {{ ansible_default_ipv4.address }}"
+
+- name: Elasticsearch | Reset elastic password user
+  ansible.builtin.shell: /usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic -b
+  register: elasticsearch_elastic_pw
+
+- name: Elasticsearch | Display elastic user info
+  ansible.builtin.debug:
+    msg: "{{ elasticsearch_elastic_pw.stdout_lines }}"
+
+- ansible.builtin.pause:
+    prompt: | 
+      For create user use:
+      /usr/share/elasticsearch/bin/elasticsearch-users useradd papmobile_user -p password -r superuser
+      where:
+       * -p: password
+       * -r: roles
+      Ref: 
+        - https://www.elastic.co/guide/en/elasticsearch/reference/current/users-command.html
+        - https://www.elastic.co/guide/en/elasticsearch/reference/current/configuring-stack-security.html
+        - https://www.elastic.co/guide/en/elasticsearch/reference/current/built-in-roles.html
+
+# curl -X GET 'http://localhost:9200/_cat/indices?v' -u elastic:(password)
+# cd /usr/share/elasticsearch/bin
+#You can use 'bin/elasticsearch-reset-elastic-password' at any time
+#in order to reset the password for the elastic user.
+
+#You can use 'bin/elasticsearch-reset-kibana-system-password' at any time
+#in order to reset the password for the kibana_system user.

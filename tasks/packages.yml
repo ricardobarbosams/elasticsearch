@@ -1,0 +1,22 @@
+---
+
+# wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /usr/share/keyrings/elasticsearch-keyring.gpg
+- name: Packages | Add elasticsearch gpg key
+  ansible.builtin.apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    keyring: /usr/share/keyrings/elasticsearch-keyring.gpg
+
+- name: Packages | Add elasticsearch repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main"
+    state: present
+    filename: /etc/apt/sources.list.d/elastic-8.x.list
+
+- name: Packages | Install packages
+  ansible.builtin.apt:
+    name: "{{ elasticsearch_packages }}"
+    state: present
+    update_cache: yes
+#  notify: 
+#    - Start ssm agent
+

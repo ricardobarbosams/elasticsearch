@@ -1,2 +1,13 @@
 ---
 # defaults file for elasticsearch
+
+elasticsearch_packages:
+  - kibana
+  - elasticsearch
+  - curl
+  - wget
+  - apt-transport-https
+  - default-jdk
+  - gnupg
+
+  

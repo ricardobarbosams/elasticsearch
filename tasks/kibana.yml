@@ -1,0 +1,45 @@
+---
+
+- name: Kibana | Add server.host
+  ansible.builtin.lineinfile:
+    path: /etc/kibana/kibana.yml
+    regexp: '#server.host: "localhost"'
+    line: "server.host: {{ ansible_default_ipv4.address }}"
+
+- name: Kibana | Enable service Kibana, and not touch the state
+  ansible.builtin.service:
+    name: kibana
+    enabled: yes
+    state: restarted
+
+- name: Kibana | Generating enrollment token
+  ansible.builtin.shell: /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana
+  register: kibana_token
+
+- name: Kibana | Enrollment token 
+  ansible.builtin.debug:
+    msg: "{{ kibana_token.stdout }}"
+
+- name: Kibana | Set enrollment token variable
+  ansible.builtin.set_fact:
+    kibana_enrollment_token: "{{ kibana_token.stdout }}"
+
+- name: Kibana | Register kibana with Elasticsearch using enrollment token  
+  ansible.builtin.shell: /usr/share/kibana/bin/kibana-setup --enrollment-token {{ kibana_enrollment_token }}
+  register: kibana_register_elasticsearch
+
+- name: Kibana | Display register on Elasticsearch
+  ansible.builtin.debug:
+    msg: "{{ kibana_register_elasticsearch }}"
+
+- name: Kibana | Restarted service Kibana to effect the change
+  ansible.builtin.service:
+    name: kibana
+    state: restarted
+
+#- ansible.builtin.pause:
+#    prompt: |
+#      After execution of this playbook you should do:
+#        1) /usr/share/kibana/bin/kibana-setup 
+#        2) 
+#        3) 

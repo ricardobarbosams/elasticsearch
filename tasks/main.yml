@@ -1,2 +1,12 @@
 ---
 # tasks file for elasticsearch
+
+- import_tasks: packages.yml
+  tags: ["elasticsearch", "elasticsearch_packages"]
+
+- import_tasks: kibana.yml
+  tags: ["elasticsearch", "elasticsearch_kibana"]
+
+- import_tasks: elasticsearch.yml
+  tags: ["elasticsearch", "elasticsearch_elasticsearch"]
+
