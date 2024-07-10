@@ -23,7 +23,7 @@
 - ansible.builtin.pause:
     prompt: | 
       For create user use:
-      /usr/share/elasticsearch/bin/elasticsearch-users useradd papmobile_user -p password -r superuser
+      /usr/share/elasticsearch/bin/elasticsearch-users useradd <username> -p password -r superuser
       where:
        * -p: password
        * -r: roles
